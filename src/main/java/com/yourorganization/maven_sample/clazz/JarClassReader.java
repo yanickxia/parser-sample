@@ -1,4 +1,4 @@
-package com.yourorganization.maven_sample;
+package com.yourorganization.maven_sample.clazz;
 
 import net.lingala.zip4j.ZipFile;
 import org.springframework.boot.loader.LaunchedURLClassLoader;
