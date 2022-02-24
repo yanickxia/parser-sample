@@ -1,6 +1,7 @@
 package com.yourorganization.maven_sample.source;
 
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SourceFileReader {
-    private String projectDir;
+    private final String projectDir;
 
     public SourceFileReader(String projectDir) {
         this.projectDir = projectDir;
@@ -25,6 +26,7 @@ public class SourceFileReader {
     public ParsedSource parsedSource(String clazz) {
         List<MethodDeclaration> methodDeclarations = new ArrayList<>();
         List<MethodCallExpr> methodCallExprs = new ArrayList<>();
+        List<ImportDeclaration> importDeclarations = new ArrayList<>();
 
         Map<MethodDeclaration, List<MethodCallExpr>> methodCalls = new HashMap<>();
         String file = projectDir + "/" + clazz.replaceAll("\\.", "/") + ".java";
@@ -35,6 +37,12 @@ public class SourceFileReader {
                     super.visit(n, arg);
                     methodDeclarations.add(n);
                     methodCalls.put(n, new ArrayList<>());
+                }
+
+                @Override
+                public void visit(ImportDeclaration n, Object arg) {
+                    super.visit(n, arg);
+                    importDeclarations.add(n);
                 }
 
                 @Override
@@ -53,7 +61,10 @@ public class SourceFileReader {
         }
 
 
-        return new ParsedSource(methodCalls);
+        return ParsedSource.builder()
+                .importDeclarations(importDeclarations)
+                .methodDeclarations(methodCalls)
+                .build();
     }
 
     private static MethodDeclaration foundMatchMethodDeclaration(List<MethodDeclaration> methodDeclarations, MethodCallExpr methodCallExpr) {
