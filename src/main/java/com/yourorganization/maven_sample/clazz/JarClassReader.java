@@ -1,6 +1,7 @@
 package com.yourorganization.maven_sample.clazz;
 
 import net.lingala.zip4j.ZipFile;
+import org.apache.bcel.classfile.ClassParser;
 import org.springframework.boot.loader.LaunchedURLClassLoader;
 import org.springframework.boot.loader.jar.JarFile;
 
@@ -47,5 +48,9 @@ public class JarClassReader {
         }
         content.add(new URL("file:" + this.tmpDir + "BOOT-INF/classes/"));
         return content;
+    }
+
+    public ClassParser getClassParser(Class<?> clazz) {
+        return new ClassParser(this.tmpDir + "BOOT-INF/classes/" + clazz.getName().replaceAll("\\.", "/") + ".class");
     }
 }
